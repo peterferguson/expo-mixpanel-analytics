@@ -1,9 +1,11 @@
 import { Platform, Dimensions } from "react-native";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MMKV } from "react-native-mmkv";
 
 import Constants from "expo-constants";
 import * as Device from "expo-device";
+
+const storage = new MMKV();
 
 import { Buffer } from "buffer";
 
@@ -20,14 +22,14 @@ export class ExpoMixpanelAnalytics {
   queue: any[] = [];
   constants: { [key: string]: string | number | void } = {};
   superProps: any = {};
-  brand?:string
+  brand?: string;
 
   constructor(token, storageKey = "mixpanel:super:props") {
     this.storageKey = storageKey;
 
     this.token = token;
     this.userId = null;
-    this.clientId = Constants.deviceId
+    this.clientId = Constants.deviceId;
     this.constants = {
       app_build_number: Constants.manifest?.revisionId,
       app_id: Constants.manifest?.slug,
@@ -48,28 +50,26 @@ export class ExpoMixpanelAnalytics {
         user_agent: userAgent,
       });
 
-      this.brand = Device.brand|| undefined;
+      this.brand = Device.brand || undefined;
       this.platform = Platform.OS;
       this.model = Device.modelName || undefined;
 
+      const result = storage.getString(this.storageKey);
+      if (result) {
+        try {
+          this.superProps = JSON.parse(result) || {};
+        } catch {}
+      }
 
-      AsyncStorage.getItem(this.storageKey, (_, result) => {
-        if (result) {
-          try {
-            this.superProps = JSON.parse(result) || {};
-          } catch {}
-        }
-
-        this.ready = true;
-        this._flush();
-      });
+      this.ready = true;
+      this._flush();
     });
   }
 
   register(props: any) {
     this.superProps = props;
     try {
-      AsyncStorage.setItem(this.storageKey, JSON.stringify(props));
+      storage.set(this.storageKey, JSON.stringify(props));
     } catch {}
   }
 
@@ -88,7 +88,7 @@ export class ExpoMixpanelAnalytics {
   reset() {
     this.identify(this.clientId);
     try {
-      AsyncStorage.setItem(this.storageKey, JSON.stringify({}));
+      storage.set(this.storageKey, JSON.stringify({}));
     } catch {}
   }
 
@@ -164,13 +164,13 @@ export class ExpoMixpanelAnalytics {
       data.properties.model = this.model;
     }
 
-    const buffer = new Buffer(JSON.stringify(data)).toString("base64");
+    const buffer = Buffer.from(JSON.stringify(data)).toString("base64");
 
     return fetch(`${MIXPANEL_API_URL}/track/?data=${buffer}`);
   }
 
   _pushProfile(data) {
-    data = new Buffer(JSON.stringify(data)).toString("base64");
+    data = Buffer.from(JSON.stringify(data)).toString("base64");
     return fetch(`${MIXPANEL_API_URL}/engage/?data=${data}`);
   }
 }

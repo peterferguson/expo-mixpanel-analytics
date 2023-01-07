@@ -1,7 +1,7 @@
 {
   "name": "@bothrs/expo-mixpanel-analytics",
   "version": "2.0.3",
-  "description": "Mixpanel integration for use with React Native apps built on Expo 39.",
+  "description": "Mixpanel integration for use with React Native apps built on Expo 47 using mmkv",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bothrs/expo-mixpanel-analytics.git"
+    "url": "git+https://github.com/peterferguson/expo-mixpanel-analytics.git"
   },
   "keywords": [
     "react",
@@ -26,23 +26,23 @@
   "author": "Ben Awad",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/codekadiya/expo-mixpanel-analytics/issues"
+    "url": "https://github.com/peterferguson/expo-mixpanel-analytics/issues"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "^1.17.11",
     "buffer": "6",
     "expo-constants": "^14.0.2",
-    "expo-device": "^5.0.0"
+    "expo-device": "^5.0.0",
+    "react-native-mmkv": "^2.5.1"
   },
   "devDependencies": {
-    "@types/react-native": "^0.67.2",
+    "@types/react-native": "^0.70.8",
     "rimraf": "3",
     "tslib": "^2.3.1",
     "typescript": "^4.6.2"
   },
   "peerDependencies": {
-    "@react-native-async-storage/async-storage": "1",
-    "react": "17",
-    "react-native": "0.64"
+    "react-native-mmkv": "^2.5.1",
+    "react": "18.1.0",
+    "react-native": "0.70.5"
   }
 }
